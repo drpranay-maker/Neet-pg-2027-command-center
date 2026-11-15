@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEET PG 2027 | Command Center</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f9;color:#172033;font-family:Arial,sans-serif}
+header{background:#14213d;color:white;padding:24px 18px}
+header h1{margin:0;font-size:25px}
+header p{color:#cbd5e1;margin-bottom:0}
+main{max-width:1000px;margin:auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:white;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px #0000000a}
+.metric{font-size:27px;font-weight:bold;margin-top:8px}
+.muted{color:#64748b;font-size:13px}
+h2{font-size:18px;margin-top:0}
+label{display:block;font-size:14px;margin:12px 0 5px}
+input,select,button{width:100%;padding:12px;border:1px solid #d6dce5;border-radius:9px;font-size:15px}
+button{background:#2563eb;color:white;border:0;font-weight:bold;margin-top:14px}
+.task{display:flex;align-items:center;gap:10px;margin:12px 0}
+.task input{width:20px;height:20px}
+.task label{margin:0}
+.routine p{margin:10px 0;font-size:14px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<h1>NEET PG 2027</h1>
+<p>COMMAND CENTER · Your preparation dashboard</p>
+</header>
+<main>
+<div class="card">
+<div class="muted">TODAY'S DATE</div>
+<div class="metric" id="today"></div>
+<div class="muted">Target: 22 May 2027 · Provisional</div>
+</div>
+
+<div class="grid">
+<div class="card"><div class="muted">QBank</div><div class="metric" id="qbank">0</div></div>
+<div class="card"><div class="muted">MDM MCQs</div><div class="metric" id="mdm">0</div></div>
+<div class="card"><div class="muted">PYQ / PYT</div><div class="metric" id="pyq">0</div></div>
+<div class="card"><div class="muted">Accuracy</div><div class="metric" id="accuracy">—</div></div>
+</div>
+
+<div class="card routine">
+<h2>Daily Study Routine</h2>
+<p>09:00 AM – 01:00 PM · LEARN</p>
+<p>02:00 PM – 05:00 PM · TRAIN</p>
+<p>06:00 PM – 08:00 PM · REVISION</p>
+<p>09:00 PM – 11:00 PM · PRACTICE</p>
+</div>
+
+<div class="card">
+<h2>Daily Progress Entry</h2>
+<label for="subject">Subject</label>
+<input id="subject" placeholder="Enter today's subject">
+
+<label for="topics">Topics completed</label>
+<input id="topics" placeholder="Enter topics completed">
+
+<label for="q">QBank questions completed</label>
+<input id="q" type="number" min="0" value="0">
+
+<label for="m">MDM MCQs completed</label>
+<input id="m" type="number" min="0" value="0">
+
+<label for="p">PYQ / PYT completed</label>
+<input id="p" type="number" min="0" value="0">
+
+<label for="correct">Correct answers</label>
+<input id="correct" type="number" min="0" value="0">
+
+<label for="incorrect">Incorrect answers</label>
+<input id="incorrect" type="number" min="0" value="0">
+
+<h2 style="margin-top:20px">Study Block Completion</h2>
+<div class="task"><input type="checkbox" id="learn"><label for="learn">Learn completed</label></div>
+<div class="task"><input type="checkbox" id="train"><label for="train">Train completed</label></div>
+<div class="task"><input type="checkbox" id="revision"><label for="revision">Revision completed</label></div>
+<div class="task"><input type="checkbox" id="practice"><label for="practice">Practice completed</label></div>
+
+<button onclick="saveEntry()">Save Today's Progress</button>
+<p class="muted" id="status"></p>
+</div>
+</main>
+<script>
+const today=new Date().toISOString().slice(0,10);
+document.getElementById("today").textContent=
+new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
+
+function saveEntry(){
+ const entry={
+  subject:document.getElementById("subject").value,
+  topics:document.getElementById("topics").value,
+  q:Number(document.getElementById("q").value)||0,
+  m:Number(document.getElementById("m").value)||0,
+  p:Number(document.getElementById("p").value)||0,
+  correct:Number(document.getElementById("correct").value)||0,
+  incorrect:Number(document.getElementById("incorrect").value)||0,
+  learn:document.getElementById("learn").checked,
+  train:document.getElementById("train").checked,
+  revision:document.getElementById("revision").checked,
+  practice:document.getElementById("practice").checked
+ };
+ localStorage.setItem("neetpg-"+today,JSON.stringify(entry));
+ document.getElementById("status").textContent="Progress saved on this device.";
+ updateMetrics(entry);
+}
+function updateMetrics(e){
+ document.getElementById("qbank").textContent=e.q;
+ document.getElementById("mdm").textContent=e.m;
+ document.getElementById("pyq").textContent=e.p;
+ const total=e.correct+e.incorrect;
+ document.getElementById("accuracy").textContent=
+ total?Math.round(e.correct/total*100)+"%":"—";
+}
+const saved=localStorage.getItem("neetpg-"+today);
+if(saved){
+ const e=JSON.parse(saved);
+ ["subject","topics","q","m","p","correct","incorrect","learn","train","revision","practice"].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el.type==="checkbox")el.checked=!!e[id];
+  else el.value=e[id]??"";
+ });
+ updateMetrics(e);
+}
+</script>
+</body>
+</html>
